@@ -11,4 +11,9 @@
 |
 */
 
-Route::view('/{any}', 'web.app')->where('any', '.*');
+Route::group(['prefix' => 'api'], function () {
+    Route::resource('users', 'UsersController');
+});
+
+Route::view('/users', 'web.users.index');
+Route::view('/{any}', 'web.index')->where('any', '.*');

@@ -9,6 +9,7 @@
     <title>Laravel 5.5 - ReactJS Example</title>
 
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/app.css') }}">
+    @yield('styles')
 
     <script type="text/javascript">
         window.Laravel = {!! json_encode([
@@ -19,7 +20,8 @@
 </head>
 
 <body>
-    <div id="app"></div>
+    @yield('content')
     <script type="text/javascript" src="{{ asset('assets/js/app.js') }}"></script>
+    @yield('scripts')
 </body>
 </html>
