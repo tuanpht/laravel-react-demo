@@ -12,32 +12,52 @@ export default class UsersTable extends Component {
                 current_page: 1,
                 per_page: 10,
             },
+            search: {
+                keyword: '',
+            },
             error: '',
             loading: false,
         }
         this.gotoPage = this.gotoPage.bind(this);
         this.setPageSize = this.setPageSize.bind(this);
+        this.handleKeywordChange = this.handleKeywordChange.bind(this);
+        this.filterByKeywordOnEnter = this.filterByKeywordOnEnter.bind(this);
     }
 
     gotoPage(event, page) {
         event.preventDefault();
         if (this.state.paging.current_page !== page) {
-            this.fetchUsers(page);
+            this.fetchUsers(page, this.state.paging.per_page, this.state.search.keyword);
         }
     }
 
     setPageSize(event) {
         let pageSize = event.target.value;
         if (this.state.paging.per_page !== pageSize) {
-            this.fetchUsers(1, pageSize);
+            this.fetchUsers(1, pageSize, this.state.search.keyword);
         }
     }
 
-    fetchUsers(page, perPage) {
+    handleKeywordChange(event) {
+        this.setState({
+            search: {
+                keyword: event.target.value,
+            }
+        });
+    }
+
+    filterByKeywordOnEnter(event) {
+        if (event.keyCode == 13) {
+            this.fetchUsers(1, this.state.paging.per_page, this.state.search.keyword);
+        }
+    }
+
+    fetchUsers(page, perPage, keyword) {
         axios.get(window.Laravel.baseUrl + "/api/users", {
                 params: {
                     page: page,
                     per_page: perPage,
+                    keyword: keyword,
                 }
             })
             .then(response => {
@@ -45,6 +65,9 @@ export default class UsersTable extends Component {
                 this.setState({
                     users: data,
                     paging: paging,
+                    search: {
+                        keyword: keyword,
+                    }
                 });
             });
     }
@@ -87,9 +110,19 @@ export default class UsersTable extends Component {
     render() {
         return (
             <App>
-                <h1>Users</h1>
+                <h2>
+                    <span className="title">Users</span>&nbsp;
+                    <a className="btn btn-sm btn-success" href="/users/create">
+                        <span className="glyphicon glyphicon-plus"></span> Add User
+                    </a>
+                </h2>
                 <div className="top-bar">
-                    <a className="btn btn-success" href="/users/create">Add User</a>
+                    <input
+                        type="text"
+                        placeholder="Enter to search..."
+                        value={this.state.search.keyword || ''}
+                        onChange={this.handleKeywordChange}
+                        onKeyDown={this.filterByKeywordOnEnter} />
                     <div className="pull-right">
                         <Pagination paging={this.state.paging} goToFunc={this.gotoPage} />
                     </div>
@@ -98,6 +131,7 @@ export default class UsersTable extends Component {
                 <div className="table-container">
                     <div className={this.state.loading ? "loading" : "hide"}></div>
                     <table className="table table-hover table-bordered">
+                        <caption>From item {this.state.paging.from} to {this.state.paging.to} of total {this.state.paging.total} items</caption>
                         <thead>
                             <tr>
                                 <td>ID</td>

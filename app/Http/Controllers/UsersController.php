@@ -14,9 +14,15 @@ class UsersController extends Controller
      */
     public function index(Request $request)
     {
-        // sleep(1); // Demo loading icon
+        sleep(1); // Demo loading icon
         $perPage = ((int) $request->query('per_page')) ?: 10;
-        return User::paginate($perPage);
+
+        $keyword = $request->query('keyword');
+        $likeQuery = "%$keyword%";
+
+        return User::where('name', 'like', $likeQuery)
+            ->orWhere('email', 'like', $likeQuery)
+            ->paginate($perPage);
     }
 
     /**
