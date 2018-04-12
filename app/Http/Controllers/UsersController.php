@@ -12,9 +12,11 @@ class UsersController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        return User::paginate(10);
+        // sleep(1); // Demo loading icon
+        $perPage = ((int) $request->query('per_page')) ?: 10;
+        return User::paginate($perPage);
     }
 
     /**
