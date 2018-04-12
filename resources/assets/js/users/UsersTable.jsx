@@ -2,6 +2,7 @@ import React, { Component } from "react"
 import App from "../layout/App"
 import UserRow from "./UserRow"
 import Pagination from "../common/Pagination"
+import Sortable from "../common/Sortable"
 
 export default class UsersTable extends Component {
     constructor(props) {
@@ -15,6 +16,10 @@ export default class UsersTable extends Component {
             search: {
                 keyword: '',
             },
+            sort: {
+                field: 'id',
+                direction: 'asc',
+            },
             error: '',
             loading: false,
         }
@@ -22,19 +27,20 @@ export default class UsersTable extends Component {
         this.setPageSize = this.setPageSize.bind(this);
         this.handleKeywordChange = this.handleKeywordChange.bind(this);
         this.filterByKeywordOnEnter = this.filterByKeywordOnEnter.bind(this);
+        this.sortByField = this.sortByField.bind(this);
     }
 
     gotoPage(event, page) {
         event.preventDefault();
         if (this.state.paging.current_page !== page) {
-            this.fetchUsers(page, this.state.paging.per_page, this.state.search.keyword);
+            this.fetchUsers(page, this.state.paging.per_page, this.state.search.keyword, this.state.sort);
         }
     }
 
     setPageSize(event) {
         let pageSize = event.target.value;
         if (this.state.paging.per_page !== pageSize) {
-            this.fetchUsers(1, pageSize, this.state.search.keyword);
+            this.fetchUsers(1, pageSize, this.state.search.keyword, this.state.sort);
         }
     }
 
@@ -48,16 +54,18 @@ export default class UsersTable extends Component {
 
     filterByKeywordOnEnter(event) {
         if (event.keyCode == 13) {
-            this.fetchUsers(1, this.state.paging.per_page, this.state.search.keyword);
+            this.fetchUsers(1, this.state.paging.per_page, this.state.search.keyword, this.state.sort);
         }
     }
 
-    fetchUsers(page, perPage, keyword) {
+    fetchUsers(page, perPage, keyword, sort) {
         axios.get(window.Laravel.baseUrl + "/api/users", {
                 params: {
                     page: page,
                     per_page: perPage,
                     keyword: keyword,
+                    sort: sort.field,
+                    dir: sort.direction,
                 }
             })
             .then(response => {
@@ -67,7 +75,8 @@ export default class UsersTable extends Component {
                     paging: paging,
                     search: {
                         keyword: keyword,
-                    }
+                    },
+                    sort: sort,
                 });
             });
     }
@@ -96,7 +105,7 @@ export default class UsersTable extends Component {
             return Promise.reject(error);
         });
 
-        this.fetchUsers();
+        this.fetchUsers(1, this.state.paging.per_page, this.state.search.keyword, this.state.sort);
     }
 
     renderUsers() {
@@ -105,6 +114,14 @@ export default class UsersTable extends Component {
                 return <UserRow user={user} key={user.id} />
             });
         }
+    }
+
+    sortByField(event, field) {
+        let sort = {...this.state.sort};
+        sort.direction = sort.field != field || sort.direction != 'asc' ? 'asc' : 'desc';
+        sort.field = field;
+
+        this.fetchUsers(this.state.paging.current_page, this.state.paging.per_page, this.state.search.keyword, sort);
     }
 
     render() {
@@ -134,9 +151,9 @@ export default class UsersTable extends Component {
                         <caption>From item {this.state.paging.from} to {this.state.paging.to} of total {this.state.paging.total} items</caption>
                         <thead>
                             <tr>
-                                <td>ID</td>
-                                <td>Name</td>
-                                <td>Email</td>
+                                <td><Sortable field="id" currentSort={this.state.sort} onClick={this.sortByField} content="ID" /></td>
+                                <td><Sortable field="name" currentSort={this.state.sort} onClick={this.sortByField} content="Name" /></td>
+                                <td><Sortable field="email" currentSort={this.state.sort} onClick={this.sortByField} content="Email" /></td>
                                 <td>Actions</td>
                             </tr>
                         </thead>

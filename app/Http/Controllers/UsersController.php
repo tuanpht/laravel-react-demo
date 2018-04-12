@@ -20,8 +20,23 @@ class UsersController extends Controller
         $keyword = $request->query('keyword');
         $likeQuery = "%$keyword%";
 
+        $sortablesFields = [
+            'id',
+            'name',
+            'email',
+        ];
+        $sortField = $request->query('sort', 'id');
+        if (!in_array($sortField, $sortablesFields)) {
+            $sortField = 'id';
+        }
+        $sortDir = $request->query('dir', 'asc');
+        if ($sortDir != 'asc' && $sortDir != 'desc') {
+            $sortDir = 'asc';
+        }
+
         return User::where('name', 'like', $likeQuery)
             ->orWhere('email', 'like', $likeQuery)
+            ->orderBy($sortField, $sortDir)
             ->paginate($perPage);
     }
 
