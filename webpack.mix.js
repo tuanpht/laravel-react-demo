@@ -14,4 +14,10 @@ let mix = require('laravel-mix');
 mix.setPublicPath('public/assets')
     .setResourceRoot('../')
     .react('resources/assets/js/app.js', 'public/assets/js')
+    .extract([
+        'axios',
+        'jquery',
+        'react',
+        'react-dom',
+    ])
     .sass('resources/assets/sass/app.scss', 'public/assets/css');

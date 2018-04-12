@@ -21,6 +21,8 @@
 
 <body>
     @yield('content')
+    <script type="text/javascript" src="{{ asset('assets/js/manifest.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('assets/js/vendor.js') }}"></script>
     <script type="text/javascript" src="{{ asset('assets/js/app.js') }}"></script>
     @yield('scripts')
 </body>
