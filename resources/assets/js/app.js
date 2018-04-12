@@ -15,8 +15,8 @@ require("./bootstrap");
 
 import React from "react";
 import ReactDOM from "react-dom";
-import App from "./components/App";
-import UsersTable from "./components/users/UsersTable";
+import App from "./layout/App";
+import UsersTable from "./users/UsersTable";
 
 if (document.getElementById("app")) {
     ReactDOM.render(<App />, document.getElementById("app"));

@@ -12,8 +12,8 @@ export default class UserRow extends Component {
                 <td>{this.props.user.name}</td>
                 <td>{this.props.user.email}</td>
                 <td className="fit-content tools-bar">
-                    <a className="btn btn-primary" href={"/users/edit/" + this.props.user.id}>Edit</a>
-                    <button className="btn btn-danger">Delete</button>
+                    <a className="btn btn-sm btn-primary" href={"/users/edit/" + this.props.user.id}>Edit</a>
+                    <button className="btn btn-sm btn-danger">Delete</button>
                 </td>
             </tr>
         )
