@@ -3,24 +3,24 @@ build:
   general_test:
     image: framgiaciteam/laravel-workspace:latest
     services:
-      mysql_test:
+      mysql:
         image: mysql:5.7
         environment:
-          MYSQL_DATABASE: homestead_test
-          MYSQL_USER: homestead_test
+          MYSQL_DATABASE: laravel_app_db_test
+          MYSQL_USER: laravel_app
           MYSQL_PASSWORD: secret
           MYSQL_ROOT_PASSWORD: root
-      redis_server:
-        image: redis:latest
     prepare:
       - cp .env.example .env
-      - php artisan config:clear
       - composer install
-      - framgia-ci test-connect mysql_test 3306 60
-      - php artisan migrate --database=mysql_test
+      - php artisan config:clear
+      - php artisan key:generate
+      - framgia-ci test-connect mysql 3306 60
+      - php artisan migrate --database=mysql
 test:
   eslint:
-    ignore: false
+    enable: true
+    ignore: true
     command: eslint --format=checkstyle
       --output-file=.framgia-ci-reports/eslint.xml
       resources/assets/js/ --ext .js
@@ -29,7 +29,9 @@ test:
     command: phpcpd --log-pmd=.framgia-ci-reports/phpcpd.xml app
   phpmd:
     ignore: true
-    command: phpmd app xml cleancode,codesize,controversial,design,naming,unusedcode --reportfile .framgia-ci-reports/phpmd.xml
+    command: phpmd app xml
+      cleancode,codesize,controversial,design,naming,unusedcode
+      --reportfile .framgia-ci-reports/phpmd.xml
   pdepend:
     ignore: true
     command: pdepend --summary-xml=.framgia-ci-reports/pdepend.xml
@@ -43,13 +45,28 @@ test:
       app
   phpcs:
     ignore: false
-    command: echo '' | phpcs --standard=Framgia --report-checkstyle=.framgia-ci-reports/phpcs.xml --ignore=app/Supports/* app
+    command: phpcs --runtime-set ignore_warnings_on_exit 1 --standard=Framgia
+      --report-checkstyle=.framgia-ci-reports/phpcs.xml
   phpunit:
     ignore: false
     command:
       - php -dzend_extension=xdebug.so vendor/bin/phpunit
         --coverage-clover=.framgia-ci-reports/coverage-clover.xml
         --coverage-html=.framgia-ci-reports/coverage
+# Deployment
+# deploy:
+#   rocketeer:
+#     image: framgiaciteam/deployer:2.0
+#     when:
+#       branch: develop
+#     commands:
+#       - php rocketeer.phar deploy --on=develop --stage=develop --no-interaction
+#   rocketeer:
+#     image: framgiaciteam/deployer:2.0
+#     when:
+#       branch: master
+#     commands:
+#       - php rocketeer.phar deploy --on=production --stage=production --no-interaction
 cache:
   composer:
     folder: vendor
