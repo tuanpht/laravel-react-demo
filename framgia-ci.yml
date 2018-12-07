@@ -45,7 +45,7 @@ test:
       app
   phpcs:
     ignore: false
-    command: phpcs --runtime-set ignore_warnings_on_exit 1 --standard=Framgia
+    command: echo '' | phpcs --runtime-set ignore_warnings_on_exit 1 --standard=Framgia
       --report-checkstyle=.framgia-ci-reports/phpcs.xml
   phpunit:
     ignore: false
