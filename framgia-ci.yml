@@ -1,9 +1,10 @@
 project_type: php
 build:
   general_test:
-    image: framgiaciteam/laravel-workspace:latest
     when:
-        branch: [develop, master]
+      branch: [master, develop]
+      event: [push, pull_request]
+    image: framgiaciteam/laravel-workspace:latest
     services:
       mysql:
         image: mysql:5.7
