@@ -2,6 +2,8 @@ project_type: php
 build:
   general_test:
     image: framgiaciteam/laravel-workspace:latest
+    when:
+        branch: [develop, master]
     services:
       mysql:
         image: mysql:5.7
