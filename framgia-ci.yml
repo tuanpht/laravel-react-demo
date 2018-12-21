@@ -1,6 +1,9 @@
 project_type: php
 build:
   general_test:
+    when:
+      branch: [master, develop]
+      event: [push, pull_request]
     image: framgiaciteam/laravel-workspace:latest
     services:
       mysql:
